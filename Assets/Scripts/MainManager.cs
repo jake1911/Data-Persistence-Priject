@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -11,13 +12,22 @@ public class MainManager : MonoBehaviour
     public Rigidbody Ball;
 
     public Text ScoreText;
+    [SerializeField]
+    private Text _highScoreText;
     public GameObject GameOverText;
+    public GameObject GameOverTextHighScore;
+    public GameObject GameOverPanel;
+    public GameObject NameText;
+    public GameObject SaveNameBTN;
+    public TMP_InputField Name;
+    public Text NameDisplay;
+   
     
     private bool m_Started = false;
     private int m_Points;
     
     private bool m_GameOver = false;
-
+    private bool m_BestScore = false;
     
     // Start is called before the first frame update
     void Start()
@@ -36,10 +46,13 @@ public class MainManager : MonoBehaviour
                 brick.onDestroyed.AddListener(AddPoint);
             }
         }
+        UpdateName();
+        UpdateHighScore();
     }
 
     private void Update()
     {
+        
         if (!m_Started)
         {
             if (Input.GetKeyDown(KeyCode.Space))
@@ -53,7 +66,7 @@ public class MainManager : MonoBehaviour
                 Ball.AddForce(forceDir * 2.0f, ForceMode.VelocityChange);
             }
         }
-        else if (m_GameOver)
+        else if (m_GameOver && !m_BestScore)
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
@@ -66,11 +79,49 @@ public class MainManager : MonoBehaviour
     {
         m_Points += point;
         ScoreText.text = $"Score : {m_Points}";
+        
+    }
+
+    void CheckHighScore()
+    {
+        if(m_Points > PlayerPrefs.GetInt("BestScore", 0))
+        {
+            m_BestScore = true;
+            NameText.SetActive(true);
+            SaveNameBTN.SetActive(true);
+               
+            
+            PlayerPrefs.SetInt("BestScore", m_Points);
+        }
+    }
+    void UpdateHighScore()
+    {
+        
+        _highScoreText.text = $"Best Score : {PlayerPrefs.GetInt("BestScore", 0)}";
+    }
+    void UpdateName()
+    {
+        
+        NameDisplay.text = PlayerPrefs.GetString("BestScoreName", Name.text);
+    }
+    public void SaveName()
+    {
+        PlayerPrefs.SetString("BestScoreName", Name.text);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     public void GameOver()
     {
+        CheckHighScore();
         m_GameOver = true;
+        GameOverPanel.SetActive(true);
+        if (m_BestScore == true)
+        {
+            GameOverTextHighScore.SetActive(true);
+        }
+        else
+        {
         GameOverText.SetActive(true);
+        }
     }
 }

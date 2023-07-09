@@ -6,14 +6,20 @@ using UnityEngine;
 public class Ball : MonoBehaviour
 {
     private Rigidbody m_Rigidbody;
+    [SerializeField]
+    private GameObject m_BounceAnim;
 
     void Start()
     {
         m_Rigidbody = GetComponent<Rigidbody>();
+        
     }
     
     private void OnCollisionExit(Collision other)
     {
+        var bounce_anim = Instantiate(m_BounceAnim, transform.position, Quaternion.identity);
+        Destroy(bounce_anim, 0.5f);
+
         var velocity = m_Rigidbody.velocity;
         
         //after a collision we accelerate a bit

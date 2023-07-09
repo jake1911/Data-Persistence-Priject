@@ -7,7 +7,7 @@ using UnityEngine.Events;
 public class Brick : MonoBehaviour
 {
     public UnityEvent<int> onDestroyed;
-    
+
     public int PointValue;
 
     void Start()
